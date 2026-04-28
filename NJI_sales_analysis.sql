@@ -201,3 +201,60 @@ WHERE os.ShiptoState = 'New Jersey'
 ) AS combined_sales
 GROUP BY Sales_Year, Sales_Month, Category
 ORDER BY Sales_Year, Sales_Month, Category;
+
+-- This query returns total sales for every product by category for the Norhteast region,(New Jersy)
+-- it also returns the total number of transactions for each month for each product category
+-- as well as the the average transation and total revenue by month for each category in the Northeast region(New Jersey)
+
+-- ----------------------------------------------------------------------
+
+-- Exercise 4.5
+-- Objective:
+-- Rank in-store sales performance for each store in the New Jersey sales territory.
+-- Only use store sales because we are analyzing New Jersey Northeast in-store sales
+
+-- Logic:
+-- Start with the store_sales table because it contains in-store sales revenue.
+-- Join store_sales to store_locations using Store_ID to identify each store’s location and state.
+-- Filter the results to only include stores in New Jersey.
+-- Group the data by each store so each store gets one summary row.
+-- Calculate total revenue, number of transactions, and average transaction size for each store.
+-- Sort by total revenue from highest to lowest to rank the best-performing stores.
+
+SELECT
+ss.Store_ID,
+sl.StoreLocation,
+sl.State,
+SUM(ss.Sale_Amount) AS Total_Store_Revenue,
+COUNT(*) AS Number_Of_Transactions,
+AVG(ss.Sale_Amount) AS Average_Transaction_Size
+FROM store_sales ss
+JOIN store_locations sl
+ON ss.Store_ID = sl.Store_ID
+WHERE sl.State = 'New Jersey'
+GROUP BY ss.Store_ID, sl.StoreLocation, sl.State
+ORDER BY Total_Store_Revenue DESC;
+
+-- This query returns a table of all in-store locations in the New Jersy 
+-- Territory sorted from best performance to the lowest by revenue 
+
+-- ---------------------------------------------------------------------
+
+-- Exercise 4.6
+
+/*
+Recommendation:
+
+Based on my analysis of the New Jersey (Northeast) sales territory, I recommend focusing next quarter on improving performance in underperforming stores and lower-performing product categories, especially those showing consistent low monthly revenue.
+
+From a business standpoint, these weaker areas represent the biggest opportunity for growth. The company should consider targeted actions such as localized promotions, better product placement, improved inventory management, and additional staff training to boost sales performance.
+
+At the same time, the top-performing stores should not be ignored. Instead, their strategies should be analyzed and replicated across weaker locations to drive consistency across the territory.
+
+It is also important to include online sales in decision-making. Since New Jersey revenue comes from both in-store and online channels, combining these insights will give a more complete picture of customer behavior. For example, if certain product categories perform better online than in-store, that could indicate a shift in customer buying preferences.
+
+Overall, the goal next quarter should be to:
+1. Close the gap between high and low-performing stores
+2. Optimize product category performance
+3. Align in-store and online strategies to maximize total revenue in the territory
+*/
