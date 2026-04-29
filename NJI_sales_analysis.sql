@@ -1,260 +1,364 @@
 -- Capstone 1 Sales Analysis
--- This script analyzes online sales for New Jersey as part of the Northeast Region.
+-- This script analyzes STORE SALES ONLY for the New Jersey sales territory.
+-- Online_sales has been excluded from all questions and answers for this updated version.
 -- -------------------------------------------------------------------
--- -------------------------------------------------------------------
+
 USE sample_sales;
 SHOW TABLES;
--- I used this prompt to confirm the tables in my database
--- ------------------------------------------------------------------
+-- I used this query to confirm the tables in my database.
+
+-- -------------------------------------------------------------------
+
 SELECT SalesManager, Region, State
 FROM Management
 WHERE SalesManager = 'Miami Vue';
 
--- I used this prompt to Identify My managers Region and State to know what sales territory i am working on
--- -------------------------------------------------------------------------
+-- Objective:
+-- Identify my sales manager, assigned region, and assigned state.
+
+-- Logic:
+-- The Management table connects each sales manager to a region and state.
+-- I filtered the table where SalesManager = 'Miami Vue' so I can confirm
+-- that my assigned territory is New Jersey in the Northeast Region.
+
+-- -------------------------------------------------------------------
 
 -- Exercise 4.1
 -- Objective:
--- Find TOTAL REVENUE (online_Sales and Store_Sales) for New Jersey in the Northeast Region,
--- The earliest and latest transaction dates, so we know what time period the data covers.
+-- Find the total STORE revenue for New Jersey, plus the earliest and latest
+-- store transaction dates so we know what time period the data covers.
 
--- Logic :    
--- For Online_Sales I filtered Where  ShiptoState = New Jersey
--- For store sales, I connected store_sales to store_locations using Store_ID, Where State = New Jersey.
+-- Logic:
+-- I started with store_sales because the updated analysis excludes online sales.
+-- I joined store_sales to store_locations using Store_ID because store_sales
+-- contains the revenue, but store_locations tells me which state each store is in.
+-- Then I filtered the results to only include New Jersey stores.
+-- I used SUM() to calculate total revenue, MIN() to find the first sale date,
+-- and MAX() to find the last sale date.
 
 SELECT
-'New Jersey Total Sales' AS Territory,
-SUM(Revenue) AS Total_Revenue,
-MIN(Sale_Date) AS Start_Date,
-MAX(Sale_Date) AS End_Date
-FROM (
-SELECT
-ss.Transaction_Date AS Sale_Date,
-ss.Sale_Amount AS Revenue
+'New Jersey Store Sales' AS Territory,
+SUM(ss.Sale_Amount) AS Total_Revenue,
+MIN(ss.Transaction_Date) AS Start_Date,
+MAX(ss.Transaction_Date) AS End_Date
 FROM store_sales ss
 JOIN store_locations sl
-ON ss.Store_ID = sl.Store_ID
-WHERE sl.State = 'New Jersey'
-UNION ALL
-SELECT
-os.Date AS Sale_Date,
-os.SalesTotal AS Revenue
-FROM online_sales os
-WHERE os.ShiptoState = 'New Jersey'
-) AS Total_Revenue;
+ON ss.Store_ID = sl.StoreID
+WHERE sl.State = 'New Jersey';
 
--- Because the question asked for an overall revenue, 
--- I took Online_sales and Store_sales into considaration
--- I combined both using UNION ALL, then calculated
--- SUM() = total revenue
--- MIN() = earliest sale date
--- MAX() = latest sale date
+-- This query answers the overall revenue question using store sales only.
+-- Online_sales is not included because this updated analysis is focused only
+-- on physical store performance in the New Jersey territory.
 
--- --------------------------------------------------------------------------
-
+-- -------------------------------------------------------------------
 
 -- Exercise 4.2
 -- Objective:
--- Find the Month-by-month revenue breakdown for New Jersey
--- (online + in-store combined).
--- Logic : 
--- Extract year and month from each transaction date,
--- group by months, Count the number of transactions for each month
--- and sum revenue per month
-
-SELECT
-YEAR(Sale_Date) AS Sales_Year,
-MONTH(Sale_Date) AS Sales_Month,
-SUM(Revenue) AS Monthly_Revenue,
-COUNT(*) AS Number_Of_Transactions
-FROM (
-SELECT
-ss.Transaction_Date AS Sale_Date,
-ss.Sale_Amount AS Revenue
-FROM store_sales ss
-JOIN store_locations sl
-ON ss.Store_ID = sl.Store_ID
-WHERE sl.State = 'New Jersey'
-
-UNION ALL
-
-SELECT
-os.Date AS Sale_Date,
-os.SalesTotal AS Revenue
-FROM online_sales os
-WHERE os.ShiptoState = 'New Jersey'
-) AS combined_sales
-GROUP BY YEAR(Sale_Date), MONTH(Sale_Date)
-ORDER BY Sales_Year, Sales_Month;
-
--- I used the columns Sales_Year and Sales Month for better readability.
--- Intead of using the full date I believe filtering the results by Year and Month
--- makes the result easier to understand base on the questions requirements
--- I used the COUNT funtion on the number of transactions for each month for better insights on monthly performance
-
-
--- ---------------------------------------------------------------------
-
--- Exercise 4.3
-
--- Objective :
--- Compare NJ total revenue vs. the entire Northeast Region total revenue.
--- Logic: 
--- First identify which states belong to the Northeast Region using the management table.
--- Then sum online + store sales for each scope and display side by side.
-
-SELECT DISTINCT State
-FROM   management
-WHERE  Region = 'Northeast';
--- I used this query to identify which states are in the Northeast Region
-
--- Objective:
--- I want to compare New Jersey territory Revenue agaist 
--- the rest of the Northeast Revenue taking into considaration 
--- that I now know all the states present in the Northeast region which are 
--- Maryland, Massachusetts, Maine, New Jersey
--- I tried to run separate UNION ALL branches but I couldnt figure out 
--- Why my values were Off as i ran separate quaries for each state but the sum of totatal revenue
--- was off so i asked Chat GPT to troubleshoot my query 
-SELECT
-CASE
-WHEN State = 'New Jersey' THEN 'New Jersey Territory'
-ELSE 'Northeast Region'
-END AS Areas_of_comparison,
--- I used this query to separate New Jersey from the Northeast Region for the purpose of my comparison
-
-SUM(Revenue) AS Total_Revenue,
-COUNT(*) AS Number_Of_Transactions
-FROM (
-SELECT
-sl.State,
-ss.Sale_Amount AS Revenue
-FROM store_sales ss
-JOIN store_locations sl
-ON ss.Store_ID = sl.Store_ID
-
-UNION ALL
-
-SELECT
-        os.ShiptoState AS State,
-        os.SalesTotal AS Revenue
-FROM online_sales os
-) AS Sales_Comparisons
-WHERE State IN ('Maryland', 'Massachusetts', 'Maine', 'New Jersey')
-GROUP BY
-CASE
-WHEN State = 'New Jersey' THEN 'New Jersey Territory'
-ELSE 'Northeast Region'
-END;
--- I sued Join to connect store_sales to store_locations using Store_ID.
--- For store sales, I used store_locations to find the state of each store.
--- For online sales, I used ShiptoState to know where the online order was shipped.
--- Then I filtered only sales from the Northeast states.
--- Finally, I separated the results into two groups: Northeast Region and New Jersey Territory
-
--- --------------------------------------------------------------------------------
-
--- Exercise 4.4
-
--- Objective:
--- Find the number of transactions per month and the average transaction size
--- by product category for New Jersey sales.
--- This includes BOTH store sales and online sales.
+-- Find the month-by-month STORE revenue breakdown for New Jersey.
 
 -- Logic:
---  Pull New Jersey store sales by joining store_sales to store_locations.
---  Pull New Jersey online sales using ShiptoState.
---  Join both sales tables to products, then to inventory_categories,
---  so each sale has a product category.
---  Use UNION ALL to combine store and online sales together.
---  Group the results by year, month, and category.
---  Count transactions, average revenue, and total revenue.
+-- Use store_sales as the main table because it contains in-store transaction data.
+-- Joine store_sales to store_locations so I could filter for New Jersey stores.
+-- Use YEAR() and MONTH() to separate each transaction date into year and month.
+-- Groupe by year and month so each month gets one summary row.
+-- Use SUM() to calculate monthly revenue and COUNT() to count the number
+-- of store transactions for each month.
 
 SELECT
-YEAR(Sale_Date) AS Sales_Year,
-MONTH(Sale_Date) AS Sales_Month,
-Category,
-COUNT(*) AS Number_Of_Transactions,
-AVG(Revenue) AS Average_Transaction_Size,
-SUM(Revenue) AS Total_Revenue
-FROM (
-SELECT
-ss.Transaction_Date AS Sale_Date,
-ss.Sale_Amount AS Revenue,
-ic.Category
+    YEAR(ss.Transaction_Date) AS Sales_Year,
+    MONTH(ss.Transaction_Date) AS Sales_Month,
+    SUM(ss.Sale_Amount) AS Monthly_Revenue,
+    COUNT(*) AS Number_Of_Transactions
 FROM store_sales ss
-JOIN store_locations sl ON ss.Store_ID = sl.Store_ID
-JOIN products p ON ss.Product_Number = p.ProdNum
-JOIN inventory_categories ic ON p.Categoryid = ic.Categoryid
+JOIN store_locations sl
+    ON ss.Store_ID = sl.StoreID
 WHERE sl.State = 'New Jersey'
+GROUP BY
+    YEAR(ss.Transaction_Date),
+    MONTH(ss.Transaction_Date)
+ORDER BY
+    Sales_Year,
+    Sales_Month;
 
-UNION ALL
+-- I used Sales_Year and Sales_Month to make the results easier to read.
+-- Instead of showing every single sale date, this query summarizes the data by month,
+-- which makes it easier to explain monthly store performance.
+
+-- -------------------------------------------------------------------
+
+-- Exercise 4.3
+-- Objective:
+-- Identify the states that belong to the Northeast Region.
+
+-- Logic:
+-- I used the management table because it connects each state to a region.
+-- I filtered where Region = 'Northeast' to see which states should be included
+-- when comparing New Jersey to the larger Northeast Region.
+
+SELECT DISTINCT State
+FROM management
+WHERE Region = 'Northeast';
+
+-- -------------------------------------------------------------------
+
+-- Exercise 4.3 Continued
+-- Objective:
+-- Compare New Jersey STORE revenue against the rest of the Northeast Region STORE revenue.
+
+-- Logic:
+-- I used store_sales as the main table because this updated version excludes online_sales.
+-- I joined store_sales to store_locations using Store_ID to identify each store's state.
+-- I joined store_locations to management using State so I could filter for the Northeast Region.
+-- I used a CASE statement to separate New Jersey from the other Northeast states.
+-- I used SUM() to calculate total revenue and COUNT() to count store transactions.
+-- I grouped by the CASE statement so the result shows New Jersey Territory and
+-- the rest of the Northeast Region as separate comparison rows.
 
 SELECT
-os.Date AS Sale_Date,
-os.SalesTotal AS Revenue,
-ic.Category
-FROM online_sales os
-JOIN products p ON os.Product_Number = p.ProdNum
-JOIN inventory_categories ic ON p.Categoryid = ic.Categoryid
-WHERE os.ShiptoState = 'New Jersey'
-) AS combined_sales
-GROUP BY Sales_Year, Sales_Month, Category
-ORDER BY Sales_Year, Sales_Month, Category;
+    CASE
+        WHEN sl.State = 'New Jersey' THEN 'New Jersey Territory'
+        ELSE 'Rest of Northeast Region'
+    END AS Area_Of_Comparison,
+    SUM(ss.Sale_Amount) AS Total_Revenue,
+    COUNT(*) AS Number_Of_Transactions
+FROM store_sales ss
+JOIN store_locations sl
+    ON ss.Store_ID = sl.StoreID
+JOIN management m
+    ON sl.State = m.State
+WHERE m.Region = 'Northeast'
+GROUP BY
+    CASE
+        WHEN sl.State = 'New Jersey' THEN 'New Jersey Territory'
+        ELSE 'Rest of Northeast Region'
+    END
+ORDER BY Total_Revenue DESC;
 
--- This query returns total sales for every product by category for the Norhteast region,(New Jersy)
--- it also returns the total number of transactions for each month for each product category
--- as well as the the average transation and total revenue by month for each category in the Northeast region(New Jersey)
+-- This query compares New Jersey store performance to the rest of the Northeast Region.
+-- Online sales are excluded because the purpose of this updated analysis is to focus
+-- only on revenue generated from physical store locations.
 
--- ----------------------------------------------------------------------
+-- -------------------------------------------------------------------
+
+-- Exercise 4.4
+-- Objective:
+-- Find the number of STORE transactions per month and the average transaction size
+-- by product category for New Jersey.
+
+-- Logic:
+-- I used store_sales because it contains store transaction details.
+-- I joined store_sales to store_locations so I could filter only New Jersey stores.
+-- I joined store_sales to products using Product_Number = ProdNum so each sale
+-- can be connected to product information.
+-- I joined products to inventory_categories using Categoryid so each sale can be
+-- grouped by product category.
+-- I grouped by year, month, and category to summarize performance by category each month.
+-- I used COUNT() to count transactions, AVG() to find average transaction size,
+-- and SUM() to calculate total revenue for each category.
+
+SELECT
+    YEAR(ss.Transaction_Date) AS Sales_Year,
+    MONTH(ss.Transaction_Date) AS Sales_Month,
+    ic.Category,
+    COUNT(*) AS Number_Of_Transactions,
+    AVG(ss.Sale_Amount) AS Average_Transaction_Size,
+    SUM(ss.Sale_Amount) AS Total_Revenue
+FROM store_sales ss
+JOIN store_locations sl
+    ON ss.Store_ID = sl.StoreID
+JOIN products p
+    ON ss.Product_Number = p.ProductNumber
+JOIN inventory_categories ic
+    ON p.Categoryid = ic.Categoryid
+WHERE sl.State = 'New Jersey'
+GROUP BY
+    YEAR(ss.Transaction_Date),
+    MONTH(ss.Transaction_Date),
+    ic.Category
+ORDER BY
+    Sales_Year,
+    Sales_Month,
+    ic.Category;
+
+-- This query shows how each product category performed each month in New Jersey stores.
+-- It helps identify categories with strong or weak in-store performance.
+
+-- -------------------------------------------------------------------
 
 -- Exercise 4.5
 -- Objective:
 -- Rank in-store sales performance for each store in the New Jersey sales territory.
--- Only use store sales because we are analyzing New Jersey Northeast in-store sales
 
 -- Logic:
--- Start with the store_sales table because it contains in-store sales revenue.
--- Join store_sales to store_locations using Store_ID to identify each store’s location and state.
--- Filter the results to only include stores in New Jersey.
--- Group the data by each store so each store gets one summary row.
--- Calculate total revenue, number of transactions, and average transaction size for each store.
--- Sort by total revenue from highest to lowest to rank the best-performing stores.
+-- I used store_sales because it contains revenue for physical store transactions.
+-- I joined store_sales to store_locations using Store_ID to identify each store location.
+-- I filtered the results to New Jersey only.
+-- I grouped by store so each store has one summary row.
+-- I calculated total store revenue, number of transactions, and average transaction size.
+-- I sorted by total revenue from highest to lowest to rank store performance.
+
+SELECT
+    ss.Store_ID,
+    sl.StoreLocation,
+    sl.State,
+    SUM(ss.Sale_Amount) AS Total_Store_Revenue,
+    COUNT(*) AS Number_Of_Transactions,
+    AVG(ss.Sale_Amount) AS Average_Transaction_Size
+FROM store_sales ss
+JOIN store_locations sl
+    ON ss.Store_ID = sl.StoreID
+WHERE sl.State = 'New Jersey'
+GROUP BY
+    ss.Store_ID,
+    sl.StoreLocation,
+    sl.State
+ORDER BY Total_Store_Revenue DESC;
+
+-- This query returns all New Jersey store locations ranked from highest revenue
+-- to lowest revenue. It helps the sales manager quickly identify the strongest
+-- and weakest physical stores in the territory.
+
+-- -------------------------------------------------------------------
+
+-- Exercise 4.6 Supporting Query 1
+-- Objective:
+-- Identify the lowest-performing New Jersey stores based on total store revenue.
+
+-- Logic:
+-- This query uses the same store ranking logic as Exercise 4.5, but sorts revenue
+-- from lowest to highest. This helps show which stores may need more sales attention,
+-- promotions, staff support, or inventory review next quarter.
 
 SELECT
 ss.Store_ID,
 sl.StoreLocation,
-sl.State,
 SUM(ss.Sale_Amount) AS Total_Store_Revenue,
 COUNT(*) AS Number_Of_Transactions,
 AVG(ss.Sale_Amount) AS Average_Transaction_Size
 FROM store_sales ss
 JOIN store_locations sl
-ON ss.Store_ID = sl.Store_ID
+ON ss.Store_ID = sl.StoreID
 WHERE sl.State = 'New Jersey'
-GROUP BY ss.Store_ID, sl.StoreLocation, sl.State
-ORDER BY Total_Store_Revenue DESC;
+GROUP BY
+ss.Store_ID,
+sl.StoreLocation
+ORDER BY Total_Store_Revenue ASC;
 
--- This query returns a table of all in-store locations in the New Jersy 
--- Territory sorted from best performance to the lowest by revenue 
+-- -------------------------------------------------------------------
 
--- ---------------------------------------------------------------------
+-- Exercise 4.6 Supporting Query 2
+-- Objective:
+-- Identify the lowest-performing product categories in New Jersey stores.
+
+-- Logic:
+-- I joined store_sales to products and inventory_categories so each transaction
+-- can be connected to a product category.
+-- I filtered to New Jersey stores only.
+-- I grouped by category and sorted revenue from lowest to highest.
+-- This helps show which product categories may need better promotion,
+-- placement, pricing, or inventory planning next quarter.
+
+SELECT
+    ic.Category,
+    SUM(ss.Sale_Amount) AS Total_Category_Revenue,
+    COUNT(*) AS Number_Of_Transactions,
+    AVG(ss.Sale_Amount) AS Average_Transaction_Size
+FROM store_sales ss
+JOIN store_locations sl
+    ON ss.Store_ID = sl.StoreID
+JOIN products p
+    ON ss.Product_Number = p.ProductNumber
+JOIN inventory_categories ic
+    ON p.Categoryid = ic.Categoryid
+WHERE sl.State = 'New Jersey'
+GROUP BY ic.Category
+ORDER BY Total_Category_Revenue ASC;
+
+-- -------------------------------------------------------------------
 
 -- Exercise 4.6
 
 /*
 Recommendation:
 
-Based on my analysis of the New Jersey (Northeast) sales territory, I recommend focusing next quarter on improving performance in underperforming stores and lower-performing product categories, especially those showing consistent low monthly revenue.
+Based on my New Jersey store sales analysis, I recommend that the sales manager focus next quarter on the lowest-performing physical stores and the product categories with weak in-store revenue.
 
-From a business standpoint, these weaker areas represent the biggest opportunity for growth. The company should consider targeted actions such as localized promotions, better product placement, improved inventory management, and additional staff training to boost sales performance.
+From a business point of view, the stores at the bottom of the ranking are the biggest opportunity for improvement. These locations may need more local promotions, better inventory planning, stronger product placement, or extra staff support. The goal should not only be to reward the best stores, but also to bring weaker stores closer to the performance level of the stronger stores.
 
-At the same time, the top-performing stores should not be ignored. Instead, their strategies should be analyzed and replicated across weaker locations to drive consistency across the territory.
+I also recommend reviewing the lowest-performing product categories in New Jersey stores. If a category has low revenue or a low average transaction size, the business should check whether customers are not interested in the product, whether the product is not being displayed well, or whether the store does not have enough inventory.
 
-It is also important to include online sales in decision-making. Since New Jersey revenue comes from both in-store and online channels, combining these insights will give a more complete picture of customer behavior. For example, if certain product categories perform better online than in-store, that could indicate a shift in customer buying preferences.
+The top-performing stores should also be studied because they may already be using strategies that can help the weaker stores. For example, if a high-performing store has better product placement, stronger customer service, or better inventory availability, those same strategies can be used in lower-performing stores.
 
-Overall, the goal next quarter should be to:
-1. Close the gap between high and low-performing stores
-2. Optimize product category performance
-3. Align in-store and online strategies to maximize total revenue in the territory
+Since this updated analysis excludes online_sales, my recommendation is focused only on in-store sales performance. The next quarter should focus on:
+1. Improving the lowest-performing New Jersey stores
+2. Strengthening weak product categories
+3. Learning from the best-performing stores and applying those strategies across the territory
+4. Increasing total store revenue and transaction size in the New Jersey sales territory
 */
+
+-- ----------------------------------------------------------------------------------------
+
+-- Question 5
+
+/*
+Recommendation:
+
+Based on my New Jersey store sales analysis, I recommend that the sales manager focus next quarter
+on the lowest-performing physical stores and the product categories with weak in-store revenue.
+
+The reason for this recommendation is that the lowest-performing stores represent the biggest
+opportunity for improvement. These stores may need more local promotions, better inventory planning,
+stronger product placement, or extra staff support.
+
+I also recommend reviewing the lowest-performing product categories because low revenue or low
+average transaction size may show that customers are not buying those products often, the products
+are not being displayed well, or inventory is not meeting customer demand.
+
+The top-performing stores should also be studied because their strategies may help improve weaker
+stores. If stronger stores have better product placement, customer service, or inventory availability,
+those same practices can be applied across the New Jersey territory.
+
+Since this analysis excludes online_sales, this recommendation is focused only on in-store sales
+performance for New Jersey stores.
+
+Overall, next quarter should focus on:
+-Improving the lowest-performing New Jersey stores
+-Strengthening weak product categories
+-Learning from the best-performing stores
+-Increasing total store revenue and average transaction size
+*/
+
+
+-- Find the lowest-performing New Jersey stores
+
+SELECT
+    ss.Store_ID,
+    sl.StoreLocation,
+    SUM(ss.Sale_Amount) AS Total_Revenue,
+    COUNT(*) AS Number_Of_Transactions,
+    AVG(ss.Sale_Amount) AS Average_Transaction_Size
+FROM store_sales ss
+JOIN store_locations sl
+    ON ss.Store_ID = sl.StoreID
+WHERE sl.State = 'New Jersey'
+GROUP BY ss.Store_ID, sl.StoreLocation
+ORDER BY Total_Revenue ASC;
+
+
+-- Find the weakest product categories in New Jersey stores
+
+SELECT
+    ic.Category,
+    SUM(ss.Sale_Amount) AS Total_Revenue,
+    COUNT(*) AS Number_Of_Transactions,
+    AVG(ss.Sale_Amount) AS Average_Transaction_Size
+FROM store_sales ss
+JOIN store_locations sl
+    ON ss.Store_ID = sl.StoreID
+JOIN products p
+    ON ss.Product_Number = p.ProductNumber
+JOIN inventory_categories ic
+    ON p.Categoryid = ic.Categoryid
+WHERE sl.State = 'New Jersey'
+GROUP BY ic.Category
+ORDER BY Total_Revenue ASC;
