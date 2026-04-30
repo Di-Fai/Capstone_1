@@ -1,0 +1,17 @@
+Store_ID,StoreLocation,State,Total_Store_Revenue,Number_Of_Transactions,Average_Transaction_Size
+835,Newark,"New Jersey",623163.53,4443,140.257378
+838,Trenton,"New Jersey",597565.68,4294,139.162944
+830,Hoboken,"New Jersey",316775.48,2250,140.789102
+824,"Atlantic City","New Jersey",314513.77,2252,139.659756
+834,"New Brunswick","New Jersey",311056.42,2277,136.608002
+833,Morristown,"New Jersey",307320.52,2258,136.102976
+839,Vineland,"New Jersey",306326.30,2209,138.671933
+827,Clifton,"New Jersey",301703.77,2327,129.653532
+836,Passaic,"New Jersey",300358.95,2163,138.862205
+828,"East Orange","New Jersey",299936.24,2198,136.458708
+831,"Jersey City","New Jersey",296244.33,2229,132.904590
+829,Hackensack,"New Jersey",293676.93,2273,129.202345
+825,Bayonne,"New Jersey",292353.59,2225,131.394872
+826,"Cape May","New Jersey",285704.59,2252,126.867047
+832,Montclair,"New Jersey",261593.20,2118,123.509537
+837,Paterson,"New Jersey",67112.57,427,157.172295
