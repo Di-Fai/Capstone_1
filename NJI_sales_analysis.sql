@@ -1,6 +1,5 @@
 -- Capstone 1 Sales Analysis
--- This script analyzes STORE SALES ONLY for the New Jersey sales territory.
--- Online_sales has been excluded from all questions and answers for this updated version.
+-- This script analyzes STORE SALES for the New Jersey sales territory.
 -- -------------------------------------------------------------------
 
 USE sample_sales;
@@ -29,10 +28,9 @@ WHERE SalesManager = 'Miami Vue';
 -- store transaction dates so we know what time period the data covers.
 
 -- Logic:
--- I started with store_sales because the updated analysis excludes online sales.
 -- I joined store_sales to store_locations using Store_ID because store_sales
--- contains the revenue, but store_locations tells me which state each store is in.
--- Then I filtered the results to only include New Jersey stores.
+-- contains the revenue, but store_locations tells me which state each store is located.
+-- I filtered the results to only include New Jersey stores.
 -- I used SUM() to calculate total revenue, MIN() to find the first sale date,
 -- and MAX() to find the last sale date.
 
@@ -46,9 +44,7 @@ JOIN store_locations sl
 ON ss.Store_ID = sl.StoreID
 WHERE sl.State = 'New Jersey';
 
--- This query answers the overall revenue question using store sales only.
--- Online_sales is not included because this updated analysis is focused only
--- on physical store performance in the New Jersey territory.
+-- This query return the overall revenue for store_sales.
 
 -- -------------------------------------------------------------------
 
@@ -58,27 +54,27 @@ WHERE sl.State = 'New Jersey';
 
 -- Logic:
 -- Use store_sales as the main table because it contains in-store transaction data.
--- Joine store_sales to store_locations so I could filter for New Jersey stores.
+-- Join store_sales to store_locations so I could filter for New Jersey stores.
 -- Use YEAR() and MONTH() to separate each transaction date into year and month.
 -- Groupe by year and month so each month gets one summary row.
 -- Use SUM() to calculate monthly revenue and COUNT() to count the number
 -- of store transactions for each month.
 
 SELECT
-    YEAR(ss.Transaction_Date) AS Sales_Year,
-    MONTH(ss.Transaction_Date) AS Sales_Month,
-    SUM(ss.Sale_Amount) AS Monthly_Revenue,
-    COUNT(*) AS Number_Of_Transactions
+YEAR(ss.Transaction_Date) AS Sales_Year,
+MONTH(ss.Transaction_Date) AS Sales_Month,
+SUM(ss.Sale_Amount) AS Monthly_Revenue,
+COUNT(*) AS Number_Of_Transactions
 FROM store_sales ss
 JOIN store_locations sl
-    ON ss.Store_ID = sl.StoreID
+ON ss.Store_ID = sl.StoreID
 WHERE sl.State = 'New Jersey'
 GROUP BY
-    YEAR(ss.Transaction_Date),
-    MONTH(ss.Transaction_Date)
+YEAR(ss.Transaction_Date),
+MONTH(ss.Transaction_Date)
 ORDER BY
-    Sales_Year,
-    Sales_Month;
+Sales_Year,
+Sales_Month;
 
 -- I used Sales_Year and Sales_Month to make the results easier to read.
 -- Instead of showing every single sale date, this query summarizes the data by month,
@@ -106,8 +102,7 @@ WHERE Region = 'Northeast';
 -- Compare New Jersey STORE revenue against the rest of the Northeast Region STORE revenue.
 
 -- Logic:
--- I used store_sales as the main table because this updated version excludes online_sales.
--- I joined store_sales to store_locations using Store_ID to identify each store's state.
+-- I joined store_sales to store_locations using Store_ID to identify each store by state.
 -- I joined store_locations to management using State so I could filter for the Northeast Region.
 -- I used a CASE statement to separate New Jersey from the other Northeast states.
 -- I used SUM() to calculate total revenue and COUNT() to count store transactions.
@@ -115,28 +110,26 @@ WHERE Region = 'Northeast';
 -- the rest of the Northeast Region as separate comparison rows.
 
 SELECT
-    CASE
-        WHEN sl.State = 'New Jersey' THEN 'New Jersey Territory'
-        ELSE 'Rest of Northeast Region'
-    END AS Area_Of_Comparison,
-    SUM(ss.Sale_Amount) AS Total_Revenue,
-    COUNT(*) AS Number_Of_Transactions
+CASE
+WHEN sl.State = 'New Jersey' THEN 'New Jersey Territory'
+ELSE 'Rest of Northeast Region'
+END AS Area_Of_Comparison,
+SUM(ss.Sale_Amount) AS Total_Revenue,
+COUNT(*) AS Number_Of_Transactions
 FROM store_sales ss
 JOIN store_locations sl
-    ON ss.Store_ID = sl.StoreID
+ON ss.Store_ID = sl.StoreID
 JOIN management m
-    ON sl.State = m.State
+ON sl.State = m.State
 WHERE m.Region = 'Northeast'
 GROUP BY
-    CASE
-        WHEN sl.State = 'New Jersey' THEN 'New Jersey Territory'
-        ELSE 'Rest of Northeast Region'
-    END
+CASE
+WHEN sl.State = 'New Jersey' THEN 'New Jersey Territory'
+ELSE 'Rest of Northeast Region'
+END
 ORDER BY Total_Revenue DESC;
 
 -- This query compares New Jersey store performance to the rest of the Northeast Region.
--- Online sales are excluded because the purpose of this updated analysis is to focus
--- only on revenue generated from physical store locations.
 
 -- -------------------------------------------------------------------
 
@@ -152,33 +145,33 @@ ORDER BY Total_Revenue DESC;
 -- can be connected to product information.
 -- I joined products to inventory_categories using Categoryid so each sale can be
 -- grouped by product category.
--- I grouped by year, month, and category to summarize performance by category each month.
+-- I grouped by year, month, and category to summarize performance by category for each month.
 -- I used COUNT() to count transactions, AVG() to find average transaction size,
 -- and SUM() to calculate total revenue for each category.
 
 SELECT
-    YEAR(ss.Transaction_Date) AS Sales_Year,
-    MONTH(ss.Transaction_Date) AS Sales_Month,
-    ic.Category,
-    COUNT(*) AS Number_Of_Transactions,
-    AVG(ss.Sale_Amount) AS Average_Transaction_Size,
-    SUM(ss.Sale_Amount) AS Total_Revenue
+YEAR(ss.Transaction_Date) AS Sales_Year,
+MONTH(ss.Transaction_Date) AS Sales_Month,
+ic.Category,
+COUNT(*) AS Number_Of_Transactions,
+AVG(ss.Sale_Amount) AS Average_Transaction_size,
+SUM(ss.Sale_Amount) AS Total_Revenue
 FROM store_sales ss
 JOIN store_locations sl
-    ON ss.Store_ID = sl.StoreID
+ON ss.Store_ID = sl.StoreID
 JOIN products p
-    ON ss.Product_Number = p.ProductNumber
+ON ss.Product_Number = p.ProductNumber
 JOIN inventory_categories ic
-    ON p.Categoryid = ic.Categoryid
+ON p.Categoryid = ic.Categoryid
 WHERE sl.State = 'New Jersey'
 GROUP BY
-    YEAR(ss.Transaction_Date),
-    MONTH(ss.Transaction_Date),
-    ic.Category
+YEAR(ss.Transaction_Date),
+MONTH(ss.Transaction_Date),
+ic.Category
 ORDER BY
-    Sales_Year,
-    Sales_Month,
-    ic.Category;
+Sales_Year,
+Sales_Month, 
+ic.Category;
 
 -- This query shows how each product category performed each month in New Jersey stores.
 -- It helps identify categories with strong or weak in-store performance.
@@ -198,20 +191,20 @@ ORDER BY
 -- I sorted by total revenue from highest to lowest to rank store performance.
 
 SELECT
-    ss.Store_ID,
-    sl.StoreLocation,
-    sl.State,
-    SUM(ss.Sale_Amount) AS Total_Store_Revenue,
-    COUNT(*) AS Number_Of_Transactions,
-    AVG(ss.Sale_Amount) AS Average_Transaction_Size
+ss.Store_ID,
+sl.StoreLocation,
+sl.State,
+SUM(ss.Sale_Amount) AS Total_Store_Revenue,
+COUNT(*) AS Number_Of_Transactions,
+AVG(ss.Sale_Amount) AS Average_Transaction_size
 FROM store_sales ss
 JOIN store_locations sl
-    ON ss.Store_ID = sl.StoreID
+ON ss.Store_ID = sl.StoreID
 WHERE sl.State = 'New Jersey'
 GROUP BY
-    ss.Store_ID,
-    sl.StoreLocation,
-    sl.State
+ss.Store_ID,
+sl.StoreLocation,
+sl.State
 ORDER BY Total_Store_Revenue DESC;
 
 -- This query returns all New Jersey store locations ranked from highest revenue
@@ -219,6 +212,7 @@ ORDER BY Total_Store_Revenue DESC;
 -- and weakest physical stores in the territory.
 
 -- -------------------------------------------------------------------
+-- Exercise 4.6
 
 -- Exercise 4.6 Supporting Query 1
 -- Objective:
@@ -234,7 +228,7 @@ ss.Store_ID,
 sl.StoreLocation,
 SUM(ss.Sale_Amount) AS Total_Store_Revenue,
 COUNT(*) AS Number_Of_Transactions,
-AVG(ss.Sale_Amount) AS Average_Transaction_Size
+AVG(ss.Sale_Amount) AS Average_Revenue
 FROM store_sales ss
 JOIN store_locations sl
 ON ss.Store_ID = sl.StoreID
@@ -253,80 +247,57 @@ ORDER BY Total_Store_Revenue ASC;
 -- Logic:
 -- I joined store_sales to products and inventory_categories so each transaction
 -- can be connected to a product category.
--- I filtered to New Jersey stores only.
+-- I filtered by New Jersey stores only.
 -- I grouped by category and sorted revenue from lowest to highest.
 -- This helps show which product categories may need better promotion,
 -- placement, pricing, or inventory planning next quarter.
 
 SELECT
-    ic.Category,
-    SUM(ss.Sale_Amount) AS Total_Category_Revenue,
-    COUNT(*) AS Number_Of_Transactions,
-    AVG(ss.Sale_Amount) AS Average_Transaction_Size
+ic.Category,
+SUM(ss.Sale_Amount) AS Total_Category_Revenue,
+COUNT(*) AS Number_Of_Transactions,
+AVG(ss.Sale_Amount) AS Average_Transaction_Revenue
 FROM store_sales ss
 JOIN store_locations sl
-    ON ss.Store_ID = sl.StoreID
+ON ss.Store_ID = sl.StoreID
 JOIN products p
-    ON ss.Product_Number = p.ProductNumber
+ON ss.Product_Number = p.ProductNumber
 JOIN inventory_categories ic
-    ON p.Categoryid = ic.Categoryid
+ON p.Categoryid = ic.Categoryid
 WHERE sl.State = 'New Jersey'
 GROUP BY ic.Category
 ORDER BY Total_Category_Revenue ASC;
 
--- -------------------------------------------------------------------
-
--- Exercise 4.6
 
 /*
 Recommendation:
 
-Based on my New Jersey store sales analysis, I recommend that the sales manager focus next quarter on the lowest-performing physical stores and the product categories with weak in-store revenue.
+Based on my New Jersey store sales analysis, My recommendation for next quarter is to focus on low-performing stores and weak product categories.
 
-From a business point of view, the stores at the bottom of the ranking are the biggest opportunity for improvement. These locations may need more local promotions, better inventory planning, stronger product placement, or extra staff support. The goal should not only be to reward the best stores, but also to bring weaker stores closer to the performance level of the stronger stores.
+From the store results, Newark and Trenton are the top-performing stores, so they should be used as a benchmark. 
+The lowest-performing store is Paterson, which has low total revenue and fewer transactions, meaning it likely needs more customer traffic, promotions, or better store strategy.
 
-I also recommend reviewing the lowest-performing product categories in New Jersey stores. If a category has low revenue or a low average transaction size, the business should check whether customers are not interested in the product, whether the product is not being displayed well, or whether the store does not have enough inventory.
+Other lower-performing stores like Montclair, Cape May, and Bayonne also need attention because they are below average compared to the top stores.
 
-The top-performing stores should also be studied because they may already be using strategies that can help the weaker stores. For example, if a high-performing store has better product placement, stronger customer service, or better inventory availability, those same strategies can be used in lower-performing stores.
+For product categories, Technology & Accessories and Textbooks are the strongest because they generate the most revenue and higher transaction values. On the other hand, Stationery and Supplies and Books generate a lower revenue and low average transaction size.
 
-Since this updated analysis excludes online_sales, my recommendation is focused only on in-store sales performance. The next quarter should focus on:
-1. Improving the lowest-performing New Jersey stores
-2. Strengthening weak product categories
-3. Learning from the best-performing stores and applying those strategies across the territory
-4. Increasing total store revenue and transaction size in the New Jersey sales territory
+To improve performance, stores can bundle low-value items with higher-value products to increase the average transaction size.
+
+Next quarter focus:
+1. Improve low-performing stores like Paterson  
+2. Increase customer traffic and sales activity  
+3. Strengthen weak categories  
+4. Apply strategies from top stores like Newark and Trenton  
+5. Increase total revenue and average transaction size  
+
+Overall, the goal is to close the gap between low and high-performing stores and improve overall store sales in New Jersey.
 */
+
+
 
 -- ----------------------------------------------------------------------------------------
 
 -- Question 5
-
-/*
-Recommendation:
-
-Based on my New Jersey store sales analysis, I recommend that the sales manager focus next quarter
-on the lowest-performing physical stores and the product categories with weak in-store revenue.
-
-The reason for this recommendation is that the lowest-performing stores represent the biggest
-opportunity for improvement. These stores may need more local promotions, better inventory planning,
-stronger product placement, or extra staff support.
-
-I also recommend reviewing the lowest-performing product categories because low revenue or low
-average transaction size may show that customers are not buying those products often, the products
-are not being displayed well, or inventory is not meeting customer demand.
-
-The top-performing stores should also be studied because their strategies may help improve weaker
-stores. If stronger stores have better product placement, customer service, or inventory availability,
-those same practices can be applied across the New Jersey territory.
-
-Since this analysis excludes online_sales, this recommendation is focused only on in-store sales
-performance for New Jersey stores.
-
-Overall, next quarter should focus on:
--Improving the lowest-performing New Jersey stores
--Strengthening weak product categories
--Learning from the best-performing stores
--Increasing total store revenue and average transaction size
-*/
 
 
 -- Find the lowest-performing New Jersey stores
@@ -343,6 +314,20 @@ JOIN store_locations sl
 WHERE sl.State = 'New Jersey'
 GROUP BY ss.Store_ID, sl.StoreLocation
 ORDER BY Total_Revenue ASC;
+
+/*
+Based on my analysis, Paterson is the lowest-performing store in New Jersey, with low total revenue and a lower number of transactions compared to other stores.
+
+This suggests that the main issue is not the value of each sale, but the lack of customer traffic and overall sales activity.
+
+To improve performance, I recommend:
+- Increasing local promotions and marketing to attract more customers
+- Improving in-store experience, such as product placement and customer service
+- Ensuring popular and high-demand products are always in stock
+- Running targeted discounts or events to bring more people into the store
+
+The goal for Paterson should be to increase the number of transactions, which will directly improve total revenue.
+*/
 
 
 -- Find the weakest product categories in New Jersey stores
@@ -362,3 +347,17 @@ JOIN inventory_categories ic
 WHERE sl.State = 'New Jersey'
 GROUP BY ic.Category
 ORDER BY Total_Revenue ASC;
+
+/*
+Based on my analysis, Stationery and Supplies is the weakest-performing category in New Jersey, with the lowest total revenue and a very low average transaction size.
+
+This shows that while customers may purchase these items, they are low-value sales and do not contribute much to overall revenue.
+
+To improve this category, I recommend:
+- Bundling stationery items with higher-value products like textbooks or technology accessories
+- Improving product visibility and placement in-store
+- Offering promotions such as “buy more, save more” deals
+- Reviewing pricing strategy to increase value per transaction
+
+The goal is to increase the average transaction size and make this category contribute more to overall store revenue.
+*/
