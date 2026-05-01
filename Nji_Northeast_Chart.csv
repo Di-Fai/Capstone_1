@@ -1,4 +1,4 @@
-Sales_Year,Sales_Month,Category,Number_Of_Transactions,Average_Transaction_Size,Total_Revenue
+Sales_Year,Sales_Month,Category,Number_Of_Transactions,Average_Transaction_size,Total_Revenue
 2022,1,"Apparel and Merchandise",79,34.615570,2734.63
 2022,1,"Art Supplies",72,32.352083,2329.35
 2022,1,"Books (General)",40,32.373750,1294.95
@@ -199,3 +199,91 @@ Sales_Year,Sales_Month,Category,Number_Of_Transactions,Average_Transaction_Size,
 2024,9,Textbooks,133,176.686090,23499.25
 2024,10,"Apparel and Merchandise",123,31.530000,3878.19
 2024,10,"Art Supplies",105,31.958000,3355.59
+2024,10,"Books (General)",66,26.932879,1777.57
+2024,10,"Stationery and Supplies",147,9.678571,1422.75
+2024,10,"Technology & Accessories",175,439.437886,76901.63
+2024,10,Textbooks,138,165.921667,22897.19
+2024,11,"Apparel and Merchandise",123,31.887236,3922.13
+2024,11,"Art Supplies",115,31.007043,3565.81
+2024,11,"Books (General)",83,27.373976,2272.04
+2024,11,"Stationery and Supplies",154,9.485065,1460.70
+2024,11,"Technology & Accessories",183,390.564262,71473.26
+2024,11,Textbooks,140,180.125429,25217.56
+2024,12,"Apparel and Merchandise",115,33.422783,3843.62
+2024,12,"Art Supplies",108,34.361667,3711.06
+2024,12,"Books (General)",52,26.503654,1378.19
+2024,12,"Stationery and Supplies",150,10.508200,1576.23
+2024,12,"Technology & Accessories",185,493.621243,91319.93
+2024,12,Textbooks,81,168.032222,13610.61
+2025,1,"Apparel and Merchandise",209,33.081818,6914.10
+2025,1,"Art Supplies",216,32.940463,7115.14
+2025,1,"Books (General)",110,28.236545,3106.02
+2025,1,"Stationery and Supplies",274,10.068467,2758.76
+2025,1,"Technology & Accessories",228,512.840965,116927.74
+2025,1,Textbooks,68,172.595588,11736.50
+2025,2,"Apparel and Merchandise",208,34.361875,7147.27
+2025,2,"Art Supplies",211,31.663270,6680.95
+2025,2,"Books (General)",118,31.276949,3690.68
+2025,2,"Stationery and Supplies",268,9.184552,2461.46
+2025,2,"Technology & Accessories",199,512.621357,102011.65
+2025,2,Textbooks,56,162.679821,9110.07
+2025,3,"Apparel and Merchandise",243,31.578395,7673.55
+2025,3,"Art Supplies",206,34.219320,7049.18
+2025,3,"Books (General)",91,31.776703,2891.68
+2025,3,"Stationery and Supplies",265,10.148340,2689.31
+2025,3,"Technology & Accessories",234,432.540128,101214.39
+2025,3,Textbooks,94,176.224787,16565.13
+2025,4,"Apparel and Merchandise",343,32.357580,11098.65
+2025,4,"Art Supplies",255,33.950863,8657.47
+2025,4,"Books (General)",152,28.922105,4396.16
+2025,4,"Stationery and Supplies",360,9.899250,3563.73
+2025,4,"Technology & Accessories",180,475.965167,85673.73
+2025,4,Textbooks,144,175.253472,25236.50
+2025,5,"Apparel and Merchandise",343,31.425277,10778.87
+2025,5,"Art Supplies",269,34.591152,9305.02
+2025,5,"Books (General)",133,31.096241,4135.80
+2025,5,"Stationery and Supplies",374,9.915642,3708.45
+2025,5,"Technology & Accessories",160,487.157500,77945.20
+2025,5,Textbooks,164,170.681829,27991.82
+2025,6,"Apparel and Merchandise",318,31.659151,10067.61
+2025,6,"Art Supplies",254,35.668228,9059.73
+2025,6,"Books (General)",127,28.715433,3646.86
+2025,6,"Stationery and Supplies",393,10.188728,4004.17
+2025,6,"Technology & Accessories",181,474.772155,85933.76
+2025,6,Textbooks,187,170.103476,31809.35
+2025,7,"Apparel and Merchandise",223,32.423857,7230.52
+2025,7,"Art Supplies",138,36.364420,5018.29
+2025,7,"Books (General)",82,30.246951,2480.25
+2025,7,"Stationery and Supplies",229,10.359694,2372.37
+2025,7,"Technology & Accessories",217,523.464839,113591.87
+2025,7,Textbooks,115,160.033043,18403.80
+2025,8,"Apparel and Merchandise",207,32.328647,6692.03
+2025,8,"Art Supplies",155,30.962645,4799.21
+2025,8,"Books (General)",80,25.913500,2073.08
+2025,8,"Stationery and Supplies",242,10.281612,2488.15
+2025,8,"Technology & Accessories",234,484.664444,113411.48
+2025,8,Textbooks,131,171.450687,22460.04
+2025,9,"Apparel and Merchandise",212,32.829340,6959.82
+2025,9,"Art Supplies",168,32.475298,5455.85
+2025,9,"Books (General)",77,29.765065,2291.91
+2025,9,"Stationery and Supplies",232,9.934440,2304.79
+2025,9,"Technology & Accessories",238,533.877689,127062.89
+2025,9,Textbooks,118,164.190847,19374.52
+2025,10,"Apparel and Merchandise",328,32.075884,10520.89
+2025,10,"Art Supplies",296,29.576926,8754.77
+2025,10,"Books (General)",129,30.791240,3972.07
+2025,10,"Stationery and Supplies",377,10.164244,3831.92
+2025,10,"Technology & Accessories",422,456.774123,192758.68
+2025,10,Textbooks,187,165.733316,30992.13
+2025,11,"Apparel and Merchandise",247,32.276478,7972.29
+2025,11,"Art Supplies",180,33.512444,6032.24
+2025,11,"Books (General)",88,27.889091,2454.24
+2025,11,"Stationery and Supplies",223,10.320807,2301.54
+2025,11,"Technology & Accessories",250,443.013680,110753.42
+2025,11,Textbooks,109,159.996330,17439.60
+2025,12,"Apparel and Merchandise",257,31.270506,8036.52
+2025,12,"Art Supplies",189,33.778836,6384.20
+2025,12,"Books (General)",78,24.778077,1932.69
+2025,12,"Stationery and Supplies",227,10.167225,2307.96
+2025,12,"Technology & Accessories",281,466.278078,131024.14
+2025,12,Textbooks,126,169.115000,21308.49
