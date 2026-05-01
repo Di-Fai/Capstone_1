@@ -1,6 +1,8 @@
 # Capstone_1
 Year Up United Capstone Week 4
 
+Capstone Presentation video:  https://yearuptemp-my.sharepoint.com/:v:/g/personal/dnji_my_yearupunited_org/IQCIaknA_jZHTL9bLp-fZ-W7AbS-o1trH7-NY0Btl8P50OE?e=UgSOme
+
 
 New Jersey (Northeast Region) Sales Territory Analysis
 
